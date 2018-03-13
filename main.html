@@ -13,13 +13,13 @@ var canvasContext;
 var ballR=5;
 var ballX=450;
 var ballY=300;
-var ballSpeedX=-8;
-var ballSpeedY=-5;
-
+var ballSpeedX=-6;
+var ballSpeedY=-Math.random()*2.5;
+var paddle1X=5;
 var paddle1Y=250;
 var paddle2Y=250;
 const PADDLE_HEIGHT=100;
-const PADDLE_THICKNESS=10;
+const PADDLE_THICKNESS=6;
 
 var player1Score=0;
 var player2Score=0;
@@ -27,13 +27,13 @@ const WINNING_SCORE=3;
 
 var pause=true;
 
-var DIFFICULTY=6;
+var DIFFICULTY=4;
 
 window.onload= function(){
 	canvas=document.getElementById('game');
 	canvasContext = canvas.getContext('2d');
 	drawEverything();
-	var frameRate=50;
+	var frameRate=100;
 	setInterval(function() {
 						moveEverything();
 						drawEverything();} ,1000/frameRate);
@@ -69,7 +69,7 @@ function drawEverything(){
 	//to make my ball
 	circle(ballX,ballY,ballR,'white');
 	//left player paddle
-	drawRect(0,paddle1Y,PADDLE_THICKNESS,PADDLE_HEIGHT,'white');
+	drawRect(paddle1X-PADDLE_THICKNESS/2,paddle1Y,PADDLE_THICKNESS,PADDLE_HEIGHT,'white');
 	//right player paddle
 	drawRect(canvas.width-PADDLE_THICKNESS,paddle2Y,PADDLE_THICKNESS,PADDLE_HEIGHT,'white');
 	
@@ -126,11 +126,11 @@ function moveEverything(){
 	ballX+=ballSpeedX;
 	ballY+=ballSpeedY;
 
-	if(ballX<=PADDLE_THICKNESS+ballR){
+	if(ballX<=paddle1X+ballR && ballX>=paddle1X-PADDLE_THICKNESS/2){
 		if(ballY>=paddle1Y  &&  ballY<=paddle1Y+PADDLE_HEIGHT){
-			ballSpeedX=-ballSpeedX;
+			ballSpeedX=Math.abs(ballSpeedX);
 			var deltaY=ballY-(paddle1Y+PADDLE_HEIGHT/2);
-			ballSpeedY=deltaY*0.2;
+			ballSpeedY=deltaY*0.1;
 		}
 	}
 	if(ballX<=0){
@@ -139,19 +139,16 @@ function moveEverything(){
 	}
 	if(ballX>=canvas.width-(PADDLE_THICKNESS+ballR)){
 		if(ballY>=paddle2Y  &&  ballY<=paddle2Y+PADDLE_HEIGHT){
-			ballSpeedX=-ballSpeedX;
+			ballSpeedX=-Math.abs(ballSpeedX);
 			var deltaY=ballY-(paddle2Y+PADDLE_HEIGHT/2);
-			ballSpeedY=deltaY*0.2;
+			ballSpeedY=deltaY*0.1;
 		}
 	}
 	if(ballX>canvas.width){
 	player1Score++;
 	ballReset();
 	}
-	if(ballY<=0){
-		ballSpeedY=-ballSpeedY;
-	}
-	if(ballY>=canvas.height){
+	if(ballY<=0 || ballY>=canvas.height){
 		ballSpeedY=-ballSpeedY;
 	}
 }
@@ -175,6 +172,7 @@ function ballReset(){
 	ballSpeedX=-ballSpeedX;
 	ballX=canvas.width/2;
 	ballY=canvas.height/2;
+	ballSpeedY=Math.random()*2.5;
 }
 
 </script>
