@@ -1,20 +1,22 @@
+<!DOCTYPE HTML>
 <html>
-<head><title>Tennis</title></head>
-<body>
-<p valign="top">
-Winning score is: 
-<inp
-</p>
+<head>
+	<title>Tennis</title>
+	  <link type="text/css" rel="stylesheet" href="css.css">
+</head>
+<body style="margin:0px; padding: 0px;">
+<p valign="top"> 
+
 <canvas id="game" width="1000" height="600"></canvas>
 <script>
 var canvas;
 var canvasContext;
 
-var ballR=5;
+var ballR=10;
 var ballX=450;
 var ballY=300;
-var ballSpeedX=-6;
-var ballSpeedY=-Math.random()*2.5;
+var ballSpeedX=-3;
+var ballSpeedY=-Math.random()*1;
 var paddle1X=5;
 var paddle1Y=250;
 var paddle2Y=250;
@@ -26,14 +28,24 @@ var player2Score=0;
 const WINNING_SCORE=3;
 
 var pause=true;
+var score=true;
 
-var DIFFICULTY=4;
+var DIFFICULTY=2;
+var HEIGHT;
+var WIDTH;
 
+//First function to load
 window.onload= function(){
 	canvas=document.getElementById('game');
 	canvasContext = canvas.getContext('2d');
+	canvasContext.canvas.width=window.innerWidth;
+	canvasContext.canvas.height=window.innerWidth*0.4;
+	HEIGHT=canvas.height;
+	WIDTH=canvas.width;
+	//Starts up the game, by drawing the basic outlines
 	drawEverything();
-	var frameRate=100;
+	//Framerate of game.
+	var frameRate=500;
 	setInterval(function() {
 						moveEverything();
 						drawEverything();} ,1000/frameRate);
@@ -44,24 +56,27 @@ window.onload= function(){
 								var mousePos=calculateMousePos(evt);
 								paddle1Y=mousePos.y-(PADDLE_HEIGHT/2);
 								paddle1X=mousePos.x;
+								if(paddle1X>canvasContext.canvas.width/2){
+									paddle1X=canvasContext.canvas.width/2;
+								}
 							});
 }
 
 function drawEverything(){
 	
 	//to draw a basic black background
-	drawRect(0,0,canvas.width,canvas.height,'black');
+	drawRect(0,0,WIDTH,HEIGHT,'black');
 	//for pausing the game in the end
-	if(pause){
+	if(pause || score){
 		canvasContext.font="25pt Impact";
 		canvasContext.textAlign="center";
 		canvasContext.fillStyle='white';
 		if(player1Score>=WINNING_SCORE){
-			canvasContext.fillText('You Win',450,100);
+			canvasContext.fillText('You Win',WIDTH/2-50,HEIGHT/2-25);
 		}
 		else if(player2Score>=WINNING_SCORE){
-			canvasContext.fillText('Computer Wins',450,100);
-		}		canvasContext.fillText("Click to Continue",445,150);
+			canvasContext.fillText('Computer Wins',WIDTH/2-50,HEIGHT/2-50);
+		}		canvasContext.fillText("Click to Continue",WIDTH/2-50,HEIGHT/2);
 		return;
 	}
 	//to draw my net
@@ -73,22 +88,25 @@ function drawEverything(){
 	//right player paddle
 	drawRect(canvas.width-PADDLE_THICKNESS,paddle2Y,PADDLE_THICKNESS,PADDLE_HEIGHT,'white');
 	
-	canvasContext.fillText(player1Score,250,100);
-	canvasContext.fillText(player2Score,canvas.width-250,100);
+	canvasContext.fillText(player1Score,WIDTH/4,HEIGHT/4);
+	canvasContext.fillText(player2Score,3*WIDTH/4,HEIGHT/4);
 	
 }
 
+//A function that draws all the content
 function drawRect(X,Y,width,height,drawColor){
 	canvasContext.fillStyle=drawColor;
 	canvasContext.fillRect(X,Y,width,height);
 }
 
+//Funtion to draw the middle line, aka NET
 function drawNet(){
 	for(var i=0;i<canvas.height;i+=40){
 		drawRect(canvas.width/2-1,i,2,20,'white');
 	}
 }
 
+//Function to draw Ball
 function circle(X,Y,radius,color){
 	canvasContext.fillStyle=color; 
 	canvasContext.beginPath();
@@ -115,11 +133,18 @@ function mouseClick(){
 						moveEverything();
 						drawEverything();} ,1000);
 		pause=false;
+		score=false;
+	}
+	if(score){
+		setInterval(function() {
+						moveEverything();
+						drawEverything();} ,1000);
+		score=false;	
 	}
 }
 
 function moveEverything(){
-	if(pause){
+	if(pause || score){
 		return;
 	}
 	computerMovement();
@@ -135,6 +160,7 @@ function moveEverything(){
 	}
 	if(ballX<=0){
 	player2Score++;
+	score=true;
 	ballReset();
 	}
 	if(ballX>=canvas.width-(PADDLE_THICKNESS+ballR)){
@@ -146,6 +172,7 @@ function moveEverything(){
 	}
 	if(ballX>canvas.width){
 	player1Score++;
+	score=true;
 	ballReset();
 	}
 	if(ballY<=0 || ballY>=canvas.height){
@@ -172,7 +199,7 @@ function ballReset(){
 	ballSpeedX=-ballSpeedX;
 	ballX=canvas.width/2;
 	ballY=canvas.height/2;
-	ballSpeedY=Math.random()*2.5;
+	ballSpeedY=Math.random()*1;
 }
 
 </script>
